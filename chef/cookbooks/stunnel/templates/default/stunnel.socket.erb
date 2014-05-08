@@ -1,0 +1,13 @@
+# Dropped off by Chef
+
+[Unit]
+Description=Stunnel socket port=20200
+After=network.target
+Requires=network.target
+
+[Socket]
+ListenStream=20200
+Accept=true
+
+[Install]
+WantedBy=containers.target

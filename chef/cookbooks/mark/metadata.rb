@@ -1,0 +1,5 @@
+maintainer        'Pantheon'
+maintainer_email  'developers@getpantheon.com'
+description       'Installs/Configures mark'
+version           '0.0.1'
+supports          'fedora'

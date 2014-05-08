@@ -1,0 +1,14 @@
+# Dropped off by Chef
+
+[Unit]
+Description=stunnel
+After=network.target
+Requires=stunnel.socket
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel.conf
+StandardInput=socket
+
+# Security isolation.
+NoNewPrivileges=true
