@@ -1,0 +1,9 @@
+# Dropped off by Chef
+
+[Unit]
+Description=Stunnel service
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/stunnel /etc/stunnel/stunnel.conf

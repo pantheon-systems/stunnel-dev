@@ -17,3 +17,7 @@ end
 yum_package "nginx" do
   action :install
 end
+
+yum_package "systemd-devel" do
+  action :install
+end
