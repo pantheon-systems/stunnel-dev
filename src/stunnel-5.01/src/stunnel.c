@@ -394,8 +394,7 @@ int bind_ports(void) {
 
     for(opt=service_options.next; opt; opt=opt->next) {
         if(opt->option.accept) {
-            opt->fd=s_socket(opt->local_addr.sa.sa_family,
-                SOCK_STREAM, 0, 1, "accept socket");
+            opt->fd=3;
             if(opt->fd<0)
                 return 1;
             if(set_socket_options(opt->fd, 0)<0) {
@@ -405,7 +404,7 @@ int bind_ports(void) {
             }
             /* local socket can't be unnamed */
             local_address=s_ntop(&opt->local_addr, addr_len(&opt->local_addr));
-            if(bind(opt->fd, &opt->local_addr.sa, addr_len(&opt->local_addr))) {
+            /*if(bind(opt->fd, &opt->local_addr.sa, addr_len(&opt->local_addr))) {
                 s_log(LOG_ERR, "Error binding service [%s] to %s",
                     opt->servname, local_address);
                 sockerror("bind");
@@ -420,7 +419,7 @@ int bind_ports(void) {
                 opt->fd=-1;
                 str_free(local_address);
                 return 1;
-            }
+            }*/
             s_poll_add(fds, opt->fd, 1, 0);
             s_log(LOG_DEBUG, "Service [%s] (FD=%d) bound to %s",
                 opt->servname, opt->fd, local_address);
