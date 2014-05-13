@@ -13317,8 +13317,72 @@ done
 
 fi
 
+# Check for systemd support for socket activation.
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sd_notify in -lsystemd-daemon" >&5
+$as_echo_n "checking for sd_notify in -lsystemd-daemon... " >&6; }
+if ${ac_cv_lib_systemd_daemon_sd_notify+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lsystemd-daemon  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char sd_notify ();
+int
+main ()
+{
+return sd_notify ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_systemd_daemon_sd_notify=yes
+else
+  ac_cv_lib_systemd_daemon_sd_notify=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_systemd_daemon_sd_notify" >&5
+$as_echo "$ac_cv_lib_systemd_daemon_sd_notify" >&6; }
+if test "x$ac_cv_lib_systemd_daemon_sd_notify" = xyes; then :
+  SYSTEMD_LIBS="-lsystemd-daemon"
+fi
+
+for ac_header in systemd/sd-daemon.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "systemd/sd-daemon.h" "ac_cv_header_systemd_sd_daemon_h" "$ac_includes_default"
+if test "x$ac_cv_header_systemd_sd_daemon_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_SYSTEMD_SD_DAEMON_H 1
+_ACEOF
+
+fi
+
+done
+
+if test "${ac_cv_header_systemd_sd_daemon_h}" = "no" || test -z "${SYSTEMD_LIBS}"; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: Your system does not support systemd." >&5
+$as_echo "$as_me: Your system does not support systemd." >&6;}
+else
+
+$as_echo "#define HAVE_SYSTEMD 1" >>confdefs.h
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: systemd detected" >&5
+$as_echo "$as_me: systemd detected" >&6;}
+fi
+
 CPPFLAGS="$valid_CPPFLAGS"
-LIBS="$valid_LIBS"
+LIBS="$valid_LIBS $SYSTEMD_LIBS"
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: **************************************** write the results" >&5
 $as_echo "$as_me: **************************************** write the results" >&6;}
