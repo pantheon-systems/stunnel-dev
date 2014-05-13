@@ -1,6 +1,12 @@
 Stunnel dev
 -----------
 
+Install https://github.com/schisamo/vagrant-omnibus using:
+
+```
+vagrant plugin install vagrant-omnibus
+```
+
 ```
 vagrant up
 vagrant ssh
