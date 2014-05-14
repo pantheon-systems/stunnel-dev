@@ -1,15 +1,1 @@
 .vagrant
-src/stunnel-5.01/Makefile
-src/stunnel-5.01/config.log
-src/stunnel-5.01/config.status
-src/stunnel-5.01/doc/Makefile
-src/stunnel-5.01/libtool
-src/stunnel-5.01/src/.deps/
-src/stunnel-5.01/src/Makefile
-src/stunnel-5.01/src/config.h
-src/stunnel-5.01/src/stamp-h1
-src/stunnel-5.01/src/stunnel3
-src/stunnel-5.01/tools/Makefile
-src/stunnel-5.01/tools/stunnel.conf-sample
-src/stunnel-5.01/tools/stunnel.init
-src/stunnel-5.01/tools/stunnel.service
