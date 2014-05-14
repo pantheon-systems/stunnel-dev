@@ -37,6 +37,9 @@
 
 #include "common.h"
 #include "prototypes.h"
+#ifdef HAVE_SYSTEMD
+#include <systemd/sd-daemon.h>
+#endif
 
 /* http://www.openssl.org/support/faq.html#PROG2 */
 #ifdef USE_WIN32
@@ -374,6 +377,7 @@ void unbind_ports(void) {
 int bind_ports(void) {
     SERVICE_OPTIONS *opt;
     char *local_address;
+    int systemd_fds;
 
 #ifdef USE_LIBWRAP
     /* execute after parse_commandline() to know service_options.next,
@@ -394,8 +398,23 @@ int bind_ports(void) {
 
     for(opt=service_options.next; opt; opt=opt->next) {
         if(opt->option.accept) {
-            opt->fd=s_socket(opt->local_addr.sa.sa_family,
-                SOCK_STREAM, 0, 1, "accept socket");
+            systemd_fds=0;
+#ifdef HAVE_SYSTEMD
+            systemd_fds = sd_listen_fds(0);
+            if(systemd_fds>1) {
+                s_log(LOG_ERR, "Too many file descriptors received from systemd, got %d", systemd_fds);
+                return 1;
+            } else if(systemd_fds==1) {
+                s_log(LOG_INFO, "Received file descriptor from systemd");
+                opt->fd = SD_LISTEN_FDS_START + 0;
+            } else if(systemd_fds<0) {
+                s_log(LOG_ERR, "Error from systemd, code %d", systemd_fds);
+                return 1;
+            }
+#endif
+            if(systemd_fds<1)
+                opt->fd=s_socket(opt->local_addr.sa.sa_family,
+                    SOCK_STREAM, 0, 1, "accept socket");
             if(opt->fd<0)
                 return 1;
             if(set_socket_options(opt->fd, 0)<0) {
@@ -405,21 +424,24 @@ int bind_ports(void) {
             }
             /* local socket can't be unnamed */
             local_address=s_ntop(&opt->local_addr, addr_len(&opt->local_addr));
-            if(bind(opt->fd, &opt->local_addr.sa, addr_len(&opt->local_addr))) {
-                s_log(LOG_ERR, "Error binding service [%s] to %s",
-                    opt->servname, local_address);
-                sockerror("bind");
-                closesocket(opt->fd);
-                opt->fd=-1;
-                str_free(local_address);
-                return 1;
-            }
-            if(listen(opt->fd, SOMAXCONN)) {
-                sockerror("listen");
-                closesocket(opt->fd);
-                opt->fd=-1;
-                str_free(local_address);
-                return 1;
+            /* we don't bind or listen on a socket inherited from systemd */
+            if(systemd_fds<1) {
+                if(bind(opt->fd, &opt->local_addr.sa, addr_len(&opt->local_addr))) {
+                    s_log(LOG_ERR, "Error binding service [%s] to %s",
+                        opt->servname, local_address);
+                    sockerror("bind");
+                    closesocket(opt->fd);
+                    opt->fd=-1;
+                    str_free(local_address);
+                    return 1;
+                }
+                if(listen(opt->fd, SOMAXCONN)) {
+                    sockerror("listen");
+                    closesocket(opt->fd);
+                    opt->fd=-1;
+                    str_free(local_address);
+                    return 1;
+                }
             }
             s_poll_add(fds, opt->fd, 1, 0);
             s_log(LOG_DEBUG, "Service [%s] (FD=%d) bound to %s",
