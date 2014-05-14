@@ -478,18 +478,8 @@ if test "$fips" = "auto"; then
     ])
 fi
 
-# Check for systemd support for socket activation.
-AC_CHECK_LIB(systemd-daemon, sd_notify, SYSTEMD_LIBS="-lsystemd-daemon")
-AC_CHECK_HEADERS(systemd/sd-daemon.h)
-if test "${ac_cv_header_systemd_sd_daemon_h}" = "no" || test -z "${SYSTEMD_LIBS}"; then
-    AC_MSG_NOTICE([Your system does not support systemd.])
-else
-    AC_DEFINE(HAVE_SYSTEMD, 1, [Define if systemd is supported])
-    AC_MSG_NOTICE([systemd detected])
-fi
-
 CPPFLAGS="$valid_CPPFLAGS"
-LIBS="$valid_LIBS $SYSTEMD_LIBS"
+LIBS="$valid_LIBS"
 
 AC_MSG_NOTICE([**************************************** write the results])
 AC_CONFIG_FILES([Makefile src/Makefile src/stunnel3 doc/Makefile tools/Makefile tools/stunnel.conf-sample tools/stunnel.init tools/stunnel.service])

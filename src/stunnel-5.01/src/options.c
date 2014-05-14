@@ -183,7 +183,7 @@ NOEXPORT char *parse_global_option(CMD cmd, char *opt, char *arg) {
     /* debug */
     switch(cmd) {
     case CMD_BEGIN:
-        new_global_options.debug_level=LOG_DEBUG;
+        new_global_options.debug_level=LOG_NOTICE;
 #if !defined (USE_WIN32) && !defined (__vms)
         new_global_options.facility=LOG_DAEMON;
 #endif
